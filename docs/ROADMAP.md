@@ -2,7 +2,7 @@
 
 Phases are a plan and may change. Lasting decisions live in `docs/adr/`.
 
-## Phase 1: MVP
+## Phase 1: MVP (done)
 
 - Scaffold: TypeScript strict, esbuild bundle to `dist/`, vitest, eslint/prettier, CI (incl. dist up-to-date check), MIT.
 - Read PR diff and full changed files (head SHA) via Octokit; detect fork PRs.
