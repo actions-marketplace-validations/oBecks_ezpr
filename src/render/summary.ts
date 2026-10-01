@@ -4,6 +4,7 @@ import { shortSha } from '../github/sticky';
 import type { Finding, Review } from '../prompt/schema';
 import type { ChainFailure } from '../providers/chain';
 import { describeFailure } from '../providers/errors';
+import { renderConfigProblems, SIZE_TIPS } from './notices';
 
 const ICON = { critical: '🔴', high: '🟠', medium: '🟡', low: '🔵' } as const;
 
@@ -32,6 +33,7 @@ export function renderReview(
     used?: string[];
     /** The workflow had no repo checkout, so Caller snippets were not searched. */
     noCheckout?: boolean;
+    configProblems?: string[];
   } = {},
 ): string {
   const lines = ['## EzPR review', ''];
@@ -69,6 +71,7 @@ export function renderReview(
       `> ⚠️ Partial review: ${ctx.files.length} of ${total} changed files were reviewed. The summary above covers only those.`,
       '',
     );
+    if (ctx.droppedDiffs.length) lines.push(`> ${SIZE_TIPS}`, '');
   }
   if (unreviewed.length) {
     lines.push(`> Not reviewed (no model could handle this part): ${paths(unreviewed)}`, '');
@@ -98,6 +101,7 @@ export function renderReview(
   if (failures.length) {
     lines.push(`> ${renderFailures(failures, opts.used)}`, '');
   }
+  lines.push(...renderConfigProblems(opts.configProblems));
   lines.push(`<sub>Reviewed by EzPR using \`${brainId}\`</sub>`);
   return lines.join('\n');
 }
@@ -154,16 +158,5 @@ export function renderSetupComment(): string {
     '  env:',
     '    GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}',
     '```',
-  ].join('\n');
-}
-
-export function renderErrorComment(message: string, failures: ChainFailure[] = []): string {
-  return [
-    SUMMARY_MARKER,
-    '## EzPR could not complete the review',
-    '',
-    failures.length ? renderFailures(failures) : message,
-    '',
-    'The job log has details. Re-push or re-run the workflow to try again.',
   ].join('\n');
 }

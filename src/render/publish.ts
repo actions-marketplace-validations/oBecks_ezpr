@@ -3,7 +3,7 @@ import { upsertSummary } from '../github/comments';
 import { ChainError } from '../providers/chain';
 import type { Gh } from '../review/types';
 import { errorText } from '../review/types';
-import { renderErrorComment } from './summary';
+import { renderErrorComment } from './notices';
 
 export type Publish = (body: string) => Promise<void>;
 
@@ -20,8 +20,14 @@ export function makePublisher(gh: Gh): Publish {
 }
 
 /** Tells the PR that the Review could not be completed. */
-export async function publishFailure(publish: Publish, err: unknown): Promise<void> {
+export async function publishFailure(
+  publish: Publish,
+  err: unknown,
+  /** The PR already has a Review; it stays, and the failure only goes to the job log. */
+  keepReview = false,
+): Promise<void> {
   core.error(errorText(err));
+  if (keepReview) return;
   const failures = err instanceof ChainError ? err.failures : [];
   await publish(renderErrorComment(errorText(err), failures));
 }
