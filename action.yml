@@ -1,0 +1,19 @@
+name: EzPR
+description: Free, open-source AI pull request reviewer with repo context.
+author: oBecks
+branding:
+  icon: eye
+  color: blue
+inputs:
+  github-token:
+    description: Token used to read the PR and post comments.
+    default: ${{ github.token }}
+  gemini-api-key:
+    description: Google AI Studio key. Falls back to the GEMINI_API_KEY environment variable.
+    required: false
+  model:
+    description: Gemini model name. Defaults to the value in the bundled config.
+    required: false
+runs:
+  using: node24
+  main: dist/index.cjs
