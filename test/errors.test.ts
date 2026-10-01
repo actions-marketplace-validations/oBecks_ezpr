@@ -30,6 +30,12 @@ describe('classify', () => {
     expect(classify(http(400, 'bad field')).kind).toBe('other');
   });
 
+  it('treats a 400 asking to reduce the message length (Groq) as context-too-long', () => {
+    expect(
+      classify(http(400, 'Please reduce the length of the messages or completion.')).kind,
+    ).toBe('context-too-long');
+  });
+
   it('treats a 400 about an invalid API key as auth (Google style)', () => {
     expect(classify(http(400, 'API key not valid. Please pass a valid API key.')).kind).toBe(
       'auth',
@@ -45,6 +51,17 @@ describe('classify', () => {
     expect(classify(http(429, 'x', { 'Retry-After': '3' })).retryAfterMs).toBe(3000);
     expect(classify(http(429, 'x', { 'retry-after-ms': '250' })).retryAfterMs).toBe(250);
     expect(classify(http(429)).retryAfterMs).toBeUndefined();
+  });
+
+  it('reads the wait from the error text when there is no header (Google style)', () => {
+    const msg = 'You exceeded your current quota. Please retry in 25.586407951s.';
+    expect(classify(http(429, msg)).retryAfterMs).toBe(25_587);
+    expect(classify(http(429, 'retry in 300ms')).retryAfterMs).toBe(300);
+    expect(classify(http(429, 'try again later')).retryAfterMs).toBeUndefined();
+  });
+
+  it('prefers the Retry-After header over the error text', () => {
+    expect(classify(http(429, 'retry in 25s', { 'retry-after': '2' })).retryAfterMs).toBe(2000);
   });
 
   it('recognises timeouts and fetch failures', () => {
