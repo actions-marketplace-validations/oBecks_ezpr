@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src test",
     "format": "prettier --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check": "eslint . && prettier --check . && tsc --noEmit && vitest run"
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
