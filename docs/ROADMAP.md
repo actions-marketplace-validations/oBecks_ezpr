@@ -25,6 +25,8 @@ Phases are a plan and may change. Lasting decisions live in `docs/adr/`.
 
 - Line-accurate placement against the diff; map Findings to review comments.
 - Skip lines already commented on in earlier runs; severity threshold decides inline vs summary-only.
+- Incremental review: the sticky marker records the last reviewed commit SHA; a new push reviews only changes since then.
+- Keep review history: the sticky Summary shows the latest review on top, earlier reviews go into a collapsed `<details>` section labelled with commit SHA and time instead of being overwritten.
 
 ## Phase 4: Better context
 
