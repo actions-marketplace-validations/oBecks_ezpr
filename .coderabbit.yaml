@@ -1,0 +1,8 @@
+# EzPR reviews its own PRs; CodeRabbit is disabled for this repo.
+reviews:
+  auto_review:
+    enabled: false
+  high_level_summary: false
+  review_status: false
+chat:
+  auto_reply: false
